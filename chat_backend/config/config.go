@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/naoina/toml"
+	"github.com/pelletier/go-toml/v2"
 	"os"
 )
 
@@ -10,7 +10,6 @@ type Config struct {
 		Database string
 		URL      string
 	}
-
 	Kafka struct {
 		URL      string
 		ClientID string
@@ -18,12 +17,12 @@ type Config struct {
 }
 
 func NewConfig(path string) *Config {
-	c := new(Config)
+	config := new(Config)
 	if f, err := os.Open(path); err != nil {
 		panic(err)
-	} else if err = toml.NewDecoder(f).Decode(c); err != nil {
+	} else if err := toml.NewDecoder(f).Decode(config); err != nil {
 		panic(err)
 	} else {
-		return c
+		return config
 	}
 }
