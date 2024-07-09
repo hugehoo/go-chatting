@@ -28,7 +28,7 @@ func NewNetwork(service *service.Service, port string) *Server {
 }
 
 func (t *tower) serverList(ctx *fiber.Ctx) error {
-	return response(ctx, http.StatusOK, t.server.service.GetAvgServerList())
+	return response(ctx, http.StatusOK, t.server.service.ResponseLiveServerList())
 }
 
 func (s *Server) Start() error {
