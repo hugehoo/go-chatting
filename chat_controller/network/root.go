@@ -21,7 +21,7 @@ type tower struct {
 }
 
 func NewNetwork(service *service.Service, port string) *Server {
-	s := &Server{engine: fiber.New(), port: port}
+	s := &Server{engine: fiber.New(), service: service, port: port}
 	// Logger middleware
 	s.engine.Use(logger.New())
 
