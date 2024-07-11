@@ -4,7 +4,7 @@ import (
 	"chat_controller/repository"
 	"chat_controller/types/table"
 	"encoding/json"
-	. "github.com/confluentinc/confluent-kafka-go/kafka"
+	. "github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"log"
 )
 
