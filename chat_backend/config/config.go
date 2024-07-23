@@ -17,12 +17,12 @@ type Config struct {
 }
 
 func NewConfig(path string) *Config {
-	config := new(Config)
+	cfg := new(Config)
 	if f, err := os.Open(path); err != nil {
 		panic(err)
-	} else if err := toml.NewDecoder(f).Decode(config); err != nil {
+	} else if err := toml.NewDecoder(f).Decode(cfg); err != nil {
 		panic(err)
 	} else {
-		return config
+		return cfg
 	}
 }
