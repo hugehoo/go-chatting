@@ -1,10 +1,7 @@
 package network
 
-import (
-	"github.com/gin-gonic/gin"
-	"websocket/types"
-)
+import "github.com/gofiber/fiber/v2"
 
-func response(c *gin.Context, s int, res interface{}, data ...string) {
-	c.JSON(s, types.NewRes(s, res, data...))
+func response(c *fiber.Ctx, status int, res interface{}, data ...string) error {
+	return c.Status(status).JSON(data)
 }

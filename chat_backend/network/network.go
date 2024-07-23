@@ -1,6 +1,7 @@
 package network
 
 import (
+	"chat_backend/service"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"log"
@@ -9,7 +10,6 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
-	"websocket/service"
 )
 
 type Server struct {

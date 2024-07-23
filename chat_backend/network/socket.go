@@ -1,9 +1,9 @@
 package network
 
 import (
+	"chat_backend/service"
 	"github.com/gorilla/websocket"
 	"time"
-	"websocket/service"
 )
 
 type Room struct {
