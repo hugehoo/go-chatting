@@ -80,6 +80,26 @@ func (r *Repository) GetChatList(roomName string) ([]*schema.Chat, error) {
 	}
 }
 
+func (r *Repository) RoomList() ([]*schema.Room, error) {
+	qs := query([]string{"SELECT * FROM", room})
+	if cursor, err := r.db.Query(qs); err != nil {
+		return nil, err
+	} else {
+		defer cursor.Close()
+		var result []*schema.Room
+
+		for cursor.Next() {
+			d := new(schema.Room)
+			if err = cursor.Scan(&d.ID, &d.Name, &d.CreateAt, &d.UpdatedAt); err != nil {
+				return nil, err
+			} else {
+				result = append(result, d)
+			}
+		}
+		return result, err
+	}
+}
+
 func (r *Repository) MakeRoom(name string) error {
 	_, err := r.db.Exec("INSERT INTO chatting.room(name) VALUES (?)", name)
 	return err
