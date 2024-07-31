@@ -28,8 +28,8 @@ func (k *Kafka) PublishEvent(topic string, value []byte, ch chan kafka.Event) (k
 	if err := k.producer.Produce(&kafka.Message{
 		TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 		Value:          value}, ch); err != nil {
-		return _, err
+		return nil, err
 	} else {
-		return <-ch, _
+		return <-ch, err
 	}
 }
