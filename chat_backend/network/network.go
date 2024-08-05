@@ -37,7 +37,6 @@ func NewServer(service *service.Service, port string) *Server {
 		fiber.HeaderExpires}, ",")
 
 	s.engine.Use(cors.New(cors.Config{
-		AllowOrigins: "*",
 		AllowMethods: strings.Join([]string{
 			fiber.MethodGet,
 			fiber.MethodPost,

@@ -31,7 +31,6 @@ type message struct {
 }
 
 const (
-	SocketBufferSize  = 1024
 	messageBufferSize = 256
 )
 
@@ -86,25 +85,43 @@ func (r *Room) Run() {
 }
 
 func (r *Room) ServeHTTP(c *fiber.Ctx) error {
+	if r == nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "Room is not initialized")
+	}
+
+	// Get the auth cookie before upgrading to WebSocket
+	authCookie := c.Cookies("auth")
+	if authCookie == "" {
+		return fiber.NewError(fiber.StatusUnauthorized, "Auth cookie is missing")
+	}
+
 	return websocket.New(func(conn *websocket.Conn) {
-		authCookie := c.Cookies("auth")
-		if authCookie == "" {
-			log.Println("auth cookie is failed")
+		if conn == nil {
+			log.Println("WebSocket connection failed")
 			return
 		}
 
-		// Create client and join the room
 		client := &Client{
 			Socket: conn,
 			Send:   make(chan *message, messageBufferSize),
 			Room:   r,
-			Name:   authCookie,
+			Name:   authCookie, // Use the authCookie we got earlier
 		}
+
+		if client == nil {
+			log.Println("Failed to create client")
+			return
+		}
+
 		r.Join <- client
 
 		// Defer leaving the room
 		// 또한 defer 를 통해서 client 가 끝날 떄를 대비하여 퇴장하는 작업을 연기한다.
-		defer func() { r.Leave <- client }()
+		defer func() {
+			if r != nil && client != nil {
+				r.Leave <- client
+			}
+		}()
 
 		// 이 후 고루틴을 통해서 write 를 실행 시킨다.
 		go client.Write()

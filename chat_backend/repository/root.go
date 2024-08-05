@@ -9,6 +9,8 @@ import (
 	"errors"
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"strings"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type Repository struct {
@@ -25,8 +27,8 @@ const (
 
 func (r *Repository) ServerSet(ip string, available bool) error {
 	// upsert
-	_, err := r.db.Exec("INSERT server_info(`ìp`, `available`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `available` = VALUES(`available`)",
-		ip, available)
+	_, err := r.db.Exec("INSERT server_info(`ip`, `available`) VALUES (?, ?)"+ // 여기까지는 일반적인 인서트문
+		" ON DUPLICATE KEY UPDATE `available` = VALUES(`available`)", ip, available)
 	return err
 }
 
