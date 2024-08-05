@@ -1,9 +1,10 @@
 [db]
 database = "mysql"
-url = "root:1234@tcp(172.17.0.2:3306)/chatting?multiStatements=true&parseTime=true"
+url = "root:1234@tcp(localhost:3306)/chatting?multiStatements=true&parseTime=true"
 
 [kafka]
-URL="localhost:9092"
+URL="127.0.0.1:9092,127.0.0.1:9093,127.0.0.1:9094"
+#URL="ec2-3-35-141-78.ap-northeast-2.compute.amazonaws.com:29092,ec2-3-35-230-201.ap-northeast-2.compute.amazonaws.com:29092"
 GroupID="chat-consumer-1"
 
 [info]
