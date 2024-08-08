@@ -90,3 +90,48 @@ services:
       - DYNAMIC_CONFIG_ENABLED=true
       - KAFKA_CLUSTERS_0_NAME=peters_kafka
       - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka-1:19092
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    depends_on:
+      - kafka-1
+      - kafka-2
+      - kafka-3
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - 3000:3000
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+
+  kafka-exporter:
+    image: danielqsj/kafka-exporter:latest
+    container_name: kafka-exporter
+    command:
+      - '--kafka.server=kafka-1:19092'
+      - '--kafka.server=kafka-2:19093'
+      - '--kafka.server=kafka-3:19094'
+    ports:
+      - "9308:9308"
+    depends_on:
+      - kafka-1
+      - kafka-2
+      - kafka-3
+      - prometheus
+
+volumes:
+  grafana-data:
