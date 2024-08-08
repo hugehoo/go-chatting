@@ -47,9 +47,10 @@ func (s *Service) PublishEvent(topic string, value []byte, ch chan kafka.Event) 
 }
 
 func (s *Service) InsertChatting(user, message, roomName string) {
-	if err := s.repository.InsertChatting(user, message, roomName); err != nil {
-		log.Println("Failed To Chat", err)
-	}
+	s.repository.InsertChatting(user, message, roomName)
+	//if err := s.repository.InsertChatting(user, message, roomName); err != nil {
+	//	log.Println("Failed To Chat", err)
+	//}
 }
 
 func (s *Service) EnterRoom(roomName string) ([]*schema.Chat, error) {

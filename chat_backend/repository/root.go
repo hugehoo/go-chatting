@@ -5,9 +5,10 @@ import (
 	messageBroker "chat_backend/repository/kafka"
 	"chat_backend/types/schema"
 	"database/sql"
-	"encoding/json"
 	"errors"
 	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"github.com/hamba/avro/v2"
+	"log"
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -19,10 +20,27 @@ type Repository struct {
 	Kafka *messageBroker.Kafka
 }
 
+type SimpleRecord struct {
+	Name    string `avro:"name"`
+	Message string `avro:"message"`
+	Room    string `avro:"room"`
+}
+
 const (
-	room       = "chatting.room"
-	chat       = "chatting.room"
-	serverInfo = "chatting.server_info"
+	messageTopic = "chat-message"
+	room         = "chatting.room"
+	chat         = "chatting.room"
+	serverInfo   = "chatting.server_info"
+	recordScheme = `{
+        "type": "record",
+        "name": "simple",
+        "namespace": "org.hamba.avro",
+        "fields" : [
+            {"name": "name", "type": "string"},
+            {"name": "message", "type": "string"},
+            {"name": "room", "type": "string"}
+        ]
+    }`
 )
 
 func (r *Repository) ServerSet(ip string, available bool) error {
@@ -45,17 +63,26 @@ func NewRepository(c *config.Config) (*Repository, error) {
 	}
 }
 
-func (r *Repository) InsertChatting(user, message, roomName string) error {
+func (r *Repository) InsertChatting(user, message, roomName string) {
 
-	// 2. kafka 로 던진 후 컨슈머 서버에서 db insert
+	scheme, err := avro.Parse(recordScheme)
+	if err != nil {
+		log.Printf("failed to parse Avro schema: %w", err)
+	}
+
+	avroRecord, err := avro.Marshal(scheme, SimpleRecord{
+		Name:    user,
+		Message: message,
+		Room:    roomName,
+	})
+	if err != nil {
+		log.Printf("failed to marshal data: %w", err)
+	}
+
 	ch := make(chan kafka.Event)
-	v, _ := json.Marshal(message)
-	r.Kafka.PublishEvent("chat-message", v, ch)
-
-	// [original] 1. chat server 에서 직접 db insert
-	_, err := r.db.Exec("INSERT INTO chatting.chat(room, name, message) VALUES (?, ?, ?)",
-		roomName, user, message)
-	return err
+	if _, err := r.Kafka.PublishEvent(messageTopic, avroRecord, ch); err != nil {
+		log.Printf("failed to publish event: %w", err)
+	}
 }
 
 func (r *Repository) GetChatList(roomName string) ([]*schema.Chat, error) {
