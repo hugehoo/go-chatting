@@ -5,7 +5,10 @@ import { Counter } from 'k6/metrics';
 
 export const options = {
     stages: [
-        { duration: '10s', target: 10 }  // 2초 동안 20 VU로 증가
+        { duration: '30', target: 100 },  // 2초 동안 20 VU로 증가
+        { duration: '30', target: 200 },  // 2초 동안 20 VU로 증가
+        { duration: '30', target: 300 },  // 2초 동안 20 VU로 증가
+        { duration: '30', target: 400 }  // 2초 동안 20 VU로 증가
     ],
 };
 
