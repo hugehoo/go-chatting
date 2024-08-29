@@ -1,23 +1,25 @@
-#global:
-#  scrape_interval: 15s
-#
-#scrape_configs:
-#  - job_name: 'kafka'
-#    static_configs:
-#      - targets:
-#          - 'kafka-1:19092'
-#          - 'kafka-2:19093'
-#          - 'kafka-3:19094'
-#  - job_name: 'kafka-exporter'
-#    static_configs:
-#      - targets:
-#          - 'kafka-exporter:9308'
-
 global:
   scrape_interval: 15s
+  scrape_timeout: 10s
 
 scrape_configs:
-  - job_name: 'kafka-exporter'
+  - job_name: 'kafka_brokers'
+    scrape_interval: 30s
+    scrape_timeout: 25s
+    static_configs:
+      - targets:
+          - 'ec2-52-79-168-132.ap-northeast-2.compute.amazonaws.com:8080'
+          - 'ec2-3-38-208-142.ap-northeast-2.compute.amazonaws.com:8080'
+          - 'ec2-43-203-211-114.ap-northeast-2.compute.amazonaws.com:8080'
+    metrics_path: '/metrics'
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'kafka_(.+)'
+        action: keep
+
+  - job_name: 'kafka_exporter'
+    scrape_interval: 30s
     static_configs:
       - targets:
           - 'kafka-exporter:9308'
+    metrics_path: '/metrics'
