@@ -1,6 +1,7 @@
 package network
 
 import (
+	"bufio"
 	"chat_controller/service"
 	"encoding/json"
 	"fmt"
@@ -9,10 +10,12 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gorilla/websocket"
+	log "github.com/sirupsen/logrus"
 	"io/ioutil"
-	"log"
 	"math/rand"
 	"net/http"
+	"os"
+	"strings"
 	"sync"
 	"time"
 )
@@ -119,8 +122,10 @@ func (t *tower) loadTest(ctx *fiber.Ctx) error {
 
 func runWebSocketClient(serverURL string, duration, id int, results chan<- string, ctx *fiber.Ctx) error {
 	// Connect to the WebSocket server
+	userId := fmt.Sprintf("user_%d", id)
 	header := http.Header{
-		"Cookie": []string{"auth=" + ctx.Cookies("auth")},
+		"Cookie": []string{"auth=" + userId},
+		//"room":   []string{fmt.Sprintf("Room%d", id%5)},
 	}
 	c, resp, err := websocket.DefaultDialer.Dial(serverURL, header)
 	if err != nil {
@@ -151,12 +156,11 @@ func runWebSocketClient(serverURL string, duration, id int, results chan<- strin
 				return
 			default:
 				msg := message{
-					Name:    fmt.Sprintf("user_%d", id),
-					Message: fmt.Sprintf("Test message %d", rand.Intn(1000)),
-					Room:    "Load Test Room",
+					Name:    userId,
+					Message: getRandomMessage(),
+					Room:    fmt.Sprintf("Room%d", id%5),
 					When:    time.Now(),
 				}
-
 				msgBytes, err := json.Marshal(msg)
 				if err != nil {
 					log.Printf("Client %d error marshaling message: %v", id, err)
@@ -186,8 +190,33 @@ func runWebSocketClient(serverURL string, duration, id int, results chan<- strin
 				results <- fmt.Sprintf("Client %d error: %v", id, err)
 				return err
 			}
-			log.Printf("Client %d received: %s", id, string(msg))
+			log.Println(string(msg))
 			messagesReceived++
 		}
 	}
+}
+
+func getRandomMessage() string {
+	file, err := os.Open("sample-chat-data.csv")
+	if err != nil {
+		return ""
+	}
+	defer file.Close()
+
+	var messages []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		messages = append(messages, strings.TrimSpace(scanner.Text()))
+	}
+
+	if err := scanner.Err(); err != nil {
+		return ""
+	}
+
+	if len(messages) == 0 {
+		return ""
+	}
+
+	randomIndex := rand.Intn(len(messages))
+	return messages[randomIndex]
 }
