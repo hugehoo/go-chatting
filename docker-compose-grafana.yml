@@ -1,0 +1,44 @@
+version: '3'
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+
+  kafka-exporter:
+    image: danielqsj/kafka-exporter:latest
+    container_name: kafka-exporter
+    command:
+      - '--kafka.server=ec2-52-79-168-132.ap-northeast-2.compute.amazonaws.com:29092'
+      - '--kafka.server=ec2-3-38-208-142.ap-northeast-2.compute.amazonaws.com:29092'
+      - '--kafka.server=ec2-43-203-211-114.ap-northeast-2.compute.amazonaws.com:29092'
+    ports:
+      - "9308:9308"
+    depends_on:
+      - prometheus
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8080:8080"
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=MyCluster
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=ec2-52-79-168-132.ap-northeast-2.compute.amazonaws.com:29092,ec2-3-38-208-142.ap-northeast-2.compute.amazonaws.com:29092,ec2-43-203-211-114.ap-northeast-2.compute.amazonaws.com:29092
+
+networks:
+  default:
+    name: monitoring_network
