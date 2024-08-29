@@ -16,7 +16,11 @@ func NewKafka(c *config.Config) (*Kafka, error) {
 	if k.producer, err = kafka.NewProducer(&kafka.ConfigMap{
 		"bootstrap.servers": c.Kafka.URL,
 		"client.id":         c.Kafka.ClientID,
-		"acks":              "all",
+		"acks":              "1",
+		"linger.ms":         "3",
+		"compression.type":  "snappy",
+		"retries":           "3",
+		"retry.backoff.ms":  "100",
 	}); err != nil {
 		return nil, err
 	} else {
