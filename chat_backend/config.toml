@@ -1,6 +1,6 @@
 [db]
 Database = "mysql"
-URL = "root:1234@tcp(localhost:3306)/chatting?multiStatements=true&parseTime=true"
+url = "root:1234@tcp(ec2-15-165-18-187.ap-northeast-2.compute.amazonaws.com:3306)/chatting?multiStatements=true&parseTime=true"
 
 [kafka]
 #URL="127.0.0.1:9092,127.0.0.1:9093,127.0.0.1:9094"
