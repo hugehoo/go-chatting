@@ -91,6 +91,9 @@ func (r *Room) ServeHTTP(c *fiber.Ctx) error {
 
 	// Get the auth cookie before upgrading to WebSocket
 	authCookie := c.Cookies("auth")
+	header := c.GetReqHeaders()
+	roomName := header["Room"]
+	log.Println(roomName)
 	if authCookie == "" {
 		return fiber.NewError(fiber.StatusUnauthorized, "Auth cookie is missing")
 	}
@@ -105,7 +108,7 @@ func (r *Room) ServeHTTP(c *fiber.Ctx) error {
 			Socket: conn,
 			Send:   make(chan *message, messageBufferSize),
 			Room:   r,
-			Name:   authCookie, // Use the authCookie we got earlier
+			Name:   authCookie,
 		}
 
 		if client == nil {
