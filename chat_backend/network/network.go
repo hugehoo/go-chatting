@@ -58,11 +58,11 @@ func NewServer(service *service.Service, port string) *Server {
 }
 
 func (s *Server) setServerInfo() {
-	if addrs, err := net.InterfaceAddrs(); err != nil {
+	if address, err := net.InterfaceAddrs(); err != nil {
 		panic(err.Error())
 	} else {
 		var ip net.IP
-		for _, addr := range addrs {
+		for _, addr := range address {
 			if ipNet, ok := addr.(*net.IPNet); ok {
 				if !ipNet.IP.IsLoopback() && ipNet.IP.To4() != nil {
 					ip = ipNet.IP
