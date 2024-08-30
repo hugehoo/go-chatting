@@ -3,7 +3,7 @@ package kafka
 import (
 	"chat_consumer/config"
 	"context"
-	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"github.com/hamba/avro/v2"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
