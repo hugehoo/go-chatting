@@ -88,6 +88,8 @@ type LoadTestConfig struct {
 
 func (t *tower) loadTest(ctx *fiber.Ctx) error {
 	config := new(LoadTestConfig)
+	serverList := t.server.service.ResponseLiveServerList()
+	log.Info("⭐️⭐️⭐️", serverList)
 	if err := ctx.BodyParser(config); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
 	}
@@ -172,7 +174,7 @@ func runWebSocketClient(serverURL string, duration, id int, results chan<- strin
 					return
 				}
 				messagesSent++
-				time.Sleep(time.Millisecond * 100) // Adjust this delay as needed
+				time.Sleep(time.Millisecond * 10) // Adjust this delay as needed
 			}
 		}
 	}()
@@ -184,13 +186,12 @@ func runWebSocketClient(serverURL string, duration, id int, results chan<- strin
 			results <- fmt.Sprintf("Client %d completed. Sent: %d, Received: %d", id, messagesSent, messagesReceived)
 			return nil
 		default:
-			_, msg, err := c.ReadMessage()
+			_, _, err := c.ReadMessage()
 			if err != nil {
 				log.Printf("Client %d read error: %v", id, err)
 				results <- fmt.Sprintf("Client %d error: %v", id, err)
 				return err
 			}
-			log.Println(string(msg))
 			messagesReceived++
 		}
 	}
