@@ -6,7 +6,7 @@ import (
 	"chat_backend/types/schema"
 	"database/sql"
 	"errors"
-	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"github.com/hamba/avro/v2"
 	"log"
 	"strings"
@@ -44,9 +44,10 @@ const (
 )
 
 func (r *Repository) ServerSet(ip string, available bool) error {
-	// upsert
-	_, err := r.db.Exec("INSERT server_info(`ip`, `available`) VALUES (?, ?)"+ // 여기까지는 일반적인 인서트문
-		" ON DUPLICATE KEY UPDATE `available` = VALUES(`available`)", ip, available)
+	_, err := r.db.Exec(
+		"INSERT INTO server_info (`ip`, `available`) VALUES (?, ?) "+
+			"ON DUPLICATE KEY UPDATE `available` = VALUES(`available`)",
+		ip, available)
 	return err
 }
 
