@@ -16,7 +16,6 @@ type Service struct {
 	AvgServerList map[string]bool
 }
 
-// (s *Service) 얘는 왜 receiver 를 안갖지?
 func NewService(repository *repository.Repository) *Service {
 	s := &Service{repository: repository, AvgServerList: make(map[string]bool)}
 	s.setServerInfo()
@@ -63,17 +62,17 @@ func (s *Service) loopKafka() {
 		switch event := ev.(type) {
 		case *Message:
 
+			// Issue : Status 가 status(소문자 시작) 로 돼있으면 대소문자 구분때문에 브로커에서 넘어오는 값을 읽지 못한다.
 			type ServerInfoEvent struct {
 				Ip     string
-				status bool
+				Status bool
 			}
 
 			var decoder ServerInfoEvent
 			if err := json.Unmarshal(event.Value, &decoder); err != nil {
 				log.Println("Failed to decode event", event.Value)
 			} else {
-				s.AvgServerList[decoder.Ip] = decoder.status
-				log.Println("Success to set serverList", decoder.Ip, decoder.status)
+				s.AvgServerList[decoder.Ip] = decoder.Status
 			}
 		case *Error:
 			log.Println("Failed To Polling Event", event.Error())
