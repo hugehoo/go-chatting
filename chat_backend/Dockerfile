@@ -13,7 +13,7 @@ COPY . .
 # Build the Go app
 RUN go build -o main .
 
-EXPOSE 7070
+EXPOSE 1010
 
 # Command to run the executable
 CMD ["./main"]
