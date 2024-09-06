@@ -1,0 +1,99 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat-controller-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chat-controller
+  template:
+    metadata:
+      labels:
+        app: chat-controller
+    spec:
+      containers:
+        - name: chat-controller
+          image: chat-controller:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 7070
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat-controller-service
+spec:
+  selector:
+    app: chat-controller
+  ports:
+    - port: 7070
+      targetPort: 7070
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat-backend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chat-backend
+  template:
+    metadata:
+      labels:
+        app: chat-backend
+    spec:
+      containers:
+        - name: chat-backend
+          image: chat-backend:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 1010
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat-backend-service
+spec:
+  selector:
+    app: chat-backend
+  ports:
+    - port: 1010
+      targetPort: 1010
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat-consumer-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chat-consumer
+  template:
+    metadata:
+      labels:
+        app: chat-consumer
+    spec:
+      containers:
+        - name: chat-consumer
+          image: chat-consumer:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 4000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat-consumer-service
+spec:
+  selector:
+    app: chat-consumer
+  ports:
+    - port: 4000
+      targetPort: 4000
+  type: ClusterIP

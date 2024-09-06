@@ -1,0 +1,85 @@
+# kafka-1
+services:
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+      - "29092:29092"
+    environment:
+      CLUSTER_ID: ${CLUSTER_ID}
+      KAFKA_NODE_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,EXTERNAL://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://172.31.0.166:9092,EXTERNAL://ec2-3-35-141-78.ap-northeast-2.compute.amazonaws.com:29092
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@172.31.0.166:9093,2@172.31.7.249:9093'
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_LOG4J_LOGGERS: "kafka.controller=DEBUG,kafka.raft=DEBUG,org.apache.kafka.raft=DEBUG"
+    volumes:
+      - ./kafka-data:/var/lib/kafka/data:rw
+
+networks:
+  default:
+    name: kafka_network
+
+
+# kafka-2
+services:
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+      - "29092:29092"
+    environment:
+      CLUSTER_ID: ${CLUSTER_ID}
+      KAFKA_NODE_ID: 2
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,EXTERNAL://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://172.31.7.249:9092,EXTERNAL://ec2-3-35-230-201.ap-northeast-2.compute.amazonaws.com:29092
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@172.31.0.166:9093,2@172.31.7.249:9093'
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_LOG4J_LOGGERS: "kafka.controller=DEBUG,kafka.raft=DEBUG,org.apache.kafka.raft=DEBUG"
+    volumes:
+      - ./kafka-data:/var/lib/kafka/data:rw
+
+networks:
+  default:
+    name: kafka_network
+
+
+
+version: '3'
+services:
+  kafka-2:
+    image: confluentinc/cp-kafka:latest
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+      - "29092:29092"
+    environment:
+      CLUSTER_ID: ${CLUSTER_ID}
+      KAFKA_NODE_ID: 2
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,EXTERNAL://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-2:9092,EXTERNAL://ec2-3-38-208-142.ap-northeast-2.compute.amazonaws.com:29092
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@172.31.0.166:9093,2@172.31.7.249:9093,3@172.31.5.118:9093'
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    volumes:
+      - ./kafka-data:/var/lib/kafka/data:rw
+
+networks:
+  default:
+    name: kafka_network
