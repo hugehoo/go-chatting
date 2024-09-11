@@ -88,7 +88,7 @@ func (s *Server) StartServer() error {
 
 	s.setServerInfo()
 	channel := make(chan os.Signal, 1)
-	signal.Notify(channel, syscall.SIGINT)
+	signal.Notify(channel, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
 		<-channel

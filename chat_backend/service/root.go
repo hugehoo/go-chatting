@@ -35,7 +35,7 @@ func (s *Service) PublishServerStatusEvent(ip string, status bool) {
 
 	if v, err := json.Marshal(event); err != nil {
 		log.Println("Failed to marshal")
-	} else if result, err := s.PublishEvent("chat", v, ch); err != nil {
+	} else if result, err := s.PublishEvent("chat-server", v, ch); err != nil {
 		log.Println("Failed To Send Event To Kafka", "err", err)
 	} else {
 		log.Println("Success To Send Event", event, result)
@@ -48,9 +48,6 @@ func (s *Service) PublishEvent(topic string, value []byte, ch chan kafka.Event) 
 
 func (s *Service) InsertChatting(user, message, roomName string) {
 	s.repository.InsertChatting(user, message, roomName)
-	//if err := s.repository.InsertChatting(user, message, roomName); err != nil {
-	//	log.Println("Failed To Chat", err)
-	//}
 }
 
 func (s *Service) EnterRoom(roomName string) ([]*schema.Chat, error) {

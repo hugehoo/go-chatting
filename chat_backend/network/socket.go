@@ -45,7 +45,13 @@ func NewRoom(service *service.Service) *Room {
 }
 
 func (c *Client) Read() {
-	defer c.Socket.Close()
+	defer func(Socket *websocket.Conn) {
+		err := Socket.Close()
+		if err != nil {
+			log.Println("Error occurred while closing Socket connection")
+		}
+	}(c.Socket)
+
 	for {
 		var msg *message
 		if err := c.Socket.ReadJSON(&msg); err != nil {
@@ -89,11 +95,7 @@ func (r *Room) ServeHTTP(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, "Room is not initialized")
 	}
 
-	// Get the auth cookie before upgrading to WebSocket
 	authCookie := c.Cookies("auth")
-	header := c.GetReqHeaders()
-	roomName := header["Room"]
-	log.Println(roomName)
 	if authCookie == "" {
 		return fiber.NewError(fiber.StatusUnauthorized, "Auth cookie is missing")
 	}
@@ -130,7 +132,7 @@ func (r *Room) ServeHTTP(c *fiber.Ctx) error {
 		go client.Write()
 
 		// Read messages (this will block until the connection is closed)
-		// 이 후 메인 루틴에서 read를 실행함으로써 해당 요청을 닫는것을 차단 -> 연결을 활성화 시키는 것이다. 채널을 활용하여
+		// 이 후 메인 루틴에서 read 를 실행함으로써 해당 요청을 닫는것을 차단 -> 연결을 활성화 시키는 것이다. 채널을 활용하여
 		client.Read()
 	})(c)
 }

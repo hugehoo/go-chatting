@@ -174,7 +174,7 @@ func runWebSocketClient(serverURL string, duration, id int, results chan<- strin
 					return
 				}
 				messagesSent++
-				time.Sleep(time.Millisecond * 10) // Adjust this delay as needed
+				time.Sleep(time.Millisecond * 100) // Adjust this delay as needed
 			}
 		}
 	}()

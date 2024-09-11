@@ -12,7 +12,7 @@ services:
     working_dir: /go/src/app
     environment:
       - GO111MODULE=on
-    command: sh -c "go build -o main . && ./main"
+    command: sh -c "go build -o main . && exec ./main"
 
   chat_backend_2:
     build:
@@ -25,7 +25,7 @@ services:
     working_dir: /go/src/app
     environment:
       - GO111MODULE=on
-    command: sh -c "go build -o main . && ./main"
+    command: sh -c "go build -o main . && exec ./main"
 
   chat_backend_3:
     build:
@@ -38,7 +38,7 @@ services:
     working_dir: /go/src/app
     environment:
       - GO111MODULE=on
-    command: sh -c "go build -o main . && ./main"
+    command: sh -c "go build -o main . && exec ./main"
 
   chat_controller:
     build:
@@ -51,30 +51,86 @@ services:
     working_dir: /go/src/app
     environment:
       - GO111MODULE=on
-    command: sh -c "go build -o main . && ./main"
+    command: sh -c "go build -o main . && exec ./main"
 
-#  chat_consumer_1:
+
+#version: '3'
+#
+#services:
+#  chat_backend_1:
 #    build:
-#      context: ./chat_consumer
+#      context: ./chat_backend
 #      dockerfile: Dockerfile
 #    ports:
-#      - "4000:4000"
+#      - "1011:1010"
 #    volumes:
-#      - ./chat_consumer:/go/src/app
+#      - ./chat_backend:/go/src/app
 #    working_dir: /go/src/app
 #    environment:
 #      - GO111MODULE=on
 #    command: sh -c "go build -o main . && ./main"
 #
-#  chat_consumer_2:
+#  chat_backend_2:
 #    build:
-#      context: ./chat_consumer
+#      context: ./chat_backend
 #      dockerfile: Dockerfile
 #    ports:
-#      - "4001:4000"
+#      - "1012:1010"
 #    volumes:
-#      - ./chat_consumer:/go/src/app
+#      - ./chat_backend:/go/src/app
 #    working_dir: /go/src/app
 #    environment:
 #      - GO111MODULE=on
 #    command: sh -c "go build -o main . && ./main"
+#
+#  chat_backend_3:
+#    build:
+#      context: ./chat_backend
+#      dockerfile: Dockerfile
+#    ports:
+#      - "1013:1010"
+#    volumes:
+#      - ./chat_backend:/go/src/app
+#    working_dir: /go/src/app
+#    environment:
+#      - GO111MODULE=on
+#    command: sh -c "go build -o main . && ./main"
+#
+#  chat_controller:
+#    build:
+#      context: ./chat_controller
+#      dockerfile: Dockerfile
+#    ports:
+#      - "7070:7070"
+#    volumes:
+#      - ./chat_controller:/go/src/app
+#    working_dir: /go/src/app
+#    environment:
+#      - GO111MODULE=on
+#    command: sh -c "go build -o main . && ./main"
+#
+##  chat_consumer_1:
+##    build:
+##      context: ./chat_consumer
+##      dockerfile: Dockerfile
+##    ports:
+##      - "4000:4000"
+##    volumes:
+##      - ./chat_consumer:/go/src/app
+##    working_dir: /go/src/app
+##    environment:
+##      - GO111MODULE=on
+##    command: sh -c "go build -o main . && ./main"
+##
+##  chat_consumer_2:
+##    build:
+##      context: ./chat_consumer
+##      dockerfile: Dockerfile
+##    ports:
+##      - "4001:4000"
+##    volumes:
+##      - ./chat_consumer:/go/src/app
+##    working_dir: /go/src/app
+##    environment:
+##      - GO111MODULE=on
+##    command: sh -c "go build -o main . && ./main"

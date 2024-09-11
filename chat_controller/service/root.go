@@ -20,7 +20,7 @@ func NewService(repository *repository.Repository) *Service {
 	s := &Service{repository: repository, AvgServerList: make(map[string]bool)}
 	s.setServerInfo()
 
-	if err := s.repository.Kafka.RegisterTopic("chat"); err != nil {
+	if err := s.repository.Kafka.RegisterTopic("chat-server"); err != nil {
 		panic(err)
 	} else {
 		go s.loopKafka()
@@ -72,6 +72,7 @@ func (s *Service) loopKafka() {
 			if err := json.Unmarshal(event.Value, &decoder); err != nil {
 				log.Println("Failed to decode event", event.Value)
 			} else {
+				log.Println("📌", decoder)
 				s.AvgServerList[decoder.Ip] = decoder.Status
 			}
 		case *Error:
