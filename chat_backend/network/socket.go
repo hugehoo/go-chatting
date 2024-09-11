@@ -1,18 +1,25 @@
 package network
 
 import (
-	"chat_backend/service"
+	service "chat_backend/service"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"log"
+	"sync"
 	"time"
 )
 
+type RoomManager struct {
+	rooms map[string]*Room
+	mutex sync.RWMutex
+}
+
 type Room struct {
-	Forward chan *message
+	ID      string
+	Clients map[*Client]bool
 	Join    chan *Client
 	Leave   chan *Client
-	Clients map[*Client]bool
+	Forward chan *message
 	service *service.Service
 }
 
@@ -73,16 +80,20 @@ func (c *Client) Write() {
 	}
 }
 
-func (r *Room) Run() {
+func (r *Room) Run(service *service.Service) {
 	for {
 		select {
 		case client := <-r.Join:
+			log.Println("JOIN")
 			r.Clients[client] = true
 		case client := <-r.Leave:
+			log.Println("LEAVE")
 			delete(r.Clients, client)
 			close(client.Send)
 		case msg := <-r.Forward:
-			go r.service.InsertChatting(msg.Name, msg.Message, msg.Room)
+			log.Println("FORWARD", msg)
+			log.Println("r.service", service)
+			go service.InsertChatting(msg.Name, msg.Message, msg.Room)
 			for client := range r.Clients {
 				client.Send <- msg
 			}
